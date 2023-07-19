@@ -6,14 +6,17 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop()
+  @Prop({ required: true })
   password: string;
 
-  @Prop()
+  @Prop({ required: true })
   first_name: string;
 
-  @Prop()
+  @Prop({ required: true })
   last_name: string;
+
+  @Prop({ default: '' })
+  avatar_url: string;
 
   @Prop({ required: false })
   refresh_token: string;

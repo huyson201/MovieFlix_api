@@ -35,9 +35,20 @@ export class AuthService {
         last_name: data.last_name,
         email: data.email,
         password: hash,
+        avatar_url: this.generateAvatarUrl(
+          `${data.first_name} ${data.last_name}`,
+        ),
       });
+
+      const tokens = await this.generateToken({
+        _id: user._id.toString(),
+        email: user.email,
+      });
+      user.refresh_token = tokens.refresh_token;
+      await user.save();
       user.password = undefined;
-      return user;
+
+      return { ...user.toObject(), ...tokens };
     } catch (error) {
       throw error;
     }
@@ -144,5 +155,9 @@ export class AuthService {
       access_token,
       refresh_token,
     };
+  }
+
+  private generateAvatarUrl(name: string) {
+    return 'https://ui-avatars.com/api/?background=random&name=' + name;
   }
 }

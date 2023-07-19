@@ -52,6 +52,7 @@ export class AuthController {
     description: "Return user's registered info",
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 409, description: 'Conflict' })
   @ApiBody({ type: RegisterDto })
   @Post('register')
   register(@Body() dto: RegisterDto) {
