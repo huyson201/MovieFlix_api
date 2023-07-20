@@ -14,11 +14,12 @@ export class FavoriteService {
   async createFavorite(dto: FavoriteDto, user: AuthData) {
     try {
       const favoriteMovie = this.favoriteModel.findOneAndUpdate(
-        { userId: user._id, movieId: dto.movieId },
+        { userId: user._id, VideoId: dto.id, type: dto.type },
         {
           $set: {
-            movieId: dto.movieId,
+            id: dto.id,
             userId: user._id,
+            type: dto.type,
           },
         },
         {
@@ -35,8 +36,9 @@ export class FavoriteService {
   async deleteFavorite(dto: FavoriteDto, user: AuthData) {
     try {
       this.favoriteModel.findOneAndDelete({
-        movieId: dto.movieId,
+        id: dto.id,
         userId: user._id,
+        type: dto.type,
       });
     } catch (error) {
       throw error;
@@ -47,7 +49,8 @@ export class FavoriteService {
     try {
       const favoriteMovie = await this.favoriteModel.findOne({
         userId: user._id,
-        movieId: dto.movieId,
+        id: dto.id,
+        type: dto.type,
       });
 
       return {

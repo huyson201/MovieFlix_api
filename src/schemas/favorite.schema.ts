@@ -4,7 +4,10 @@ import { SchemaTypes, HydratedDocument } from 'mongoose';
 @Schema({ collection: 'favorites', timestamps: true })
 export class Favorite {
   @Prop({ required: true })
-  movieId: string;
+  id: string;
+
+  @Prop({ required: true, enum: ['movie', 'tv'] })
+  type: 'movie' | 'tv';
 
   @Prop({
     type: SchemaTypes.ObjectId,
