@@ -13,6 +13,12 @@ export class Favorite {
     index: true,
   })
   userId: string;
+
+  @Prop()
+  createdAt?: Date;
+
+  @Prop()
+  updatedAt?: Date;
 }
 
 export type FavoriteDocument = HydratedDocument<Favorite>;

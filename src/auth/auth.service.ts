@@ -76,6 +76,21 @@ export class AuthService {
     }
   }
 
+  async logout(userId: string) {
+    try {
+      const user = await this.userModel.findById(userId);
+      if (!user) throw new UnauthorizedException();
+      user.refresh_token = null;
+      await user.save();
+      return {
+        message: 'Successfully logged out',
+        statusCode: 200,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getProfile(_id: string) {
     try {
       const user = await this.userModel.findById(_id);

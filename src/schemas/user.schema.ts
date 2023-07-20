@@ -20,6 +20,12 @@ export class User {
 
   @Prop({ required: false })
   refresh_token: string;
+
+  @Prop()
+  createdAt?: Date;
+
+  @Prop()
+  updatedAt?: Date;
 }
 export type UserDocument = HydratedDocument<User>;
 export const UserSchema = SchemaFactory.createForClass(User);

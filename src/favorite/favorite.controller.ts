@@ -21,6 +21,7 @@ export class FavoriteController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @HttpCode(200)
   @Get('check')
   checkFavorite(@Body() dto: FavoriteDto, @User() user: AuthData) {
     return this.favoriteService.checkAddedToFavorites(dto, user);
@@ -28,6 +29,7 @@ export class FavoriteController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @HttpCode(201)
   @Post()
   createFavorite(@Body() dto: FavoriteDto, @User() user: AuthData) {
     return this.favoriteService.createFavorite(dto, user);
