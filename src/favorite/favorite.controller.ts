@@ -6,6 +6,7 @@ import {
   UseGuards,
   HttpCode,
   Get,
+  UseFilters,
 } from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -13,6 +14,7 @@ import { User } from 'src/decorators/user.decorator';
 import { FavoriteDto } from './dto/Favorite.dto';
 import { AuthData } from 'src/express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { BadRequestExceptionFilter } from 'src/ExceptionFilter/BadRequestException.filter';
 
 @ApiTags('Favorites')
 @Controller('favorites')
@@ -21,6 +23,7 @@ export class FavoriteController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @UseFilters(BadRequestExceptionFilter)
   @HttpCode(200)
   @Get('check')
   checkFavorite(@Body() dto: FavoriteDto, @User() user: AuthData) {
@@ -29,6 +32,7 @@ export class FavoriteController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @UseFilters(BadRequestExceptionFilter)
   @HttpCode(201)
   @Post()
   createFavorite(@Body() dto: FavoriteDto, @User() user: AuthData) {
@@ -37,8 +41,9 @@ export class FavoriteController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @UseFilters(BadRequestExceptionFilter)
   @Delete()
-  @HttpCode(204)
+  @HttpCode(200)
   deleteFavorite(@Body() dto: FavoriteDto, @User() user: AuthData) {
     return this.favoriteService.deleteFavorite(dto, user);
   }

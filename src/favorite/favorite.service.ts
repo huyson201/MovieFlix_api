@@ -14,7 +14,7 @@ export class FavoriteService {
   async createFavorite(dto: FavoriteDto, user: AuthData) {
     try {
       const favoriteMovie = this.favoriteModel.findOneAndUpdate(
-        { userId: user._id, VideoId: dto.id, type: dto.type },
+        { userId: user._id, id: dto.id, type: dto.type },
         {
           $set: {
             id: dto.id,
@@ -35,7 +35,7 @@ export class FavoriteService {
 
   async deleteFavorite(dto: FavoriteDto, user: AuthData) {
     try {
-      this.favoriteModel.findOneAndDelete({
+      return this.favoriteModel.findOneAndDelete({
         id: dto.id,
         userId: user._id,
         type: dto.type,
