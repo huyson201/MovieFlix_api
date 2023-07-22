@@ -7,6 +7,7 @@ import {
   HttpCode,
   Get,
   UseFilters,
+  Query,
 } from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -26,7 +27,7 @@ export class FavoriteController {
   @UseFilters(BadRequestExceptionFilter)
   @HttpCode(200)
   @Get('check')
-  checkFavorite(@Body() dto: FavoriteDto, @User() user: AuthData) {
+  checkFavorite(@Query() dto: FavoriteDto, @User() user: AuthData) {
     return this.favoriteService.checkAddedToFavorites(dto, user);
   }
 
