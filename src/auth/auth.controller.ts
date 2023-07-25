@@ -8,6 +8,11 @@ import {
   Query,
   UseFilters,
   HttpCode,
+  Patch,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipeBuilder,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -20,6 +25,8 @@ import { FavoriteQueryDto } from './dto/getFavoriteQuery.dto';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BadRequestExceptionFilter } from 'src/ExceptionFilter/BadRequestException.filter';
 import { AuthData } from 'src/express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateProfileDto } from './dto/UpdateProfile.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -100,5 +107,27 @@ export class AuthController {
   @Post('refresh_token')
   refreshToken(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshToken(dto);
+  }
+
+  @UseFilters(BadRequestExceptionFilter)
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  @Patch('profile')
+  updateProfile(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: new RegExp(/(png|jgp|jpeg)/i),
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+          fileIsRequired: false,
+        }),
+    )
+    file: Express.Multer.File,
+    @Body() data: UpdateProfileDto,
+    @User() user: AuthData,
+  ) {
+    return this.authService.updateProfile(user._id, data, file);
   }
 }

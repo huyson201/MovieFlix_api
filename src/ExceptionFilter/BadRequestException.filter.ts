@@ -22,7 +22,7 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
     let message = '';
 
     if (typeof errorResponse === 'string') {
-      return response.status(status).json(exception.getResponse());
+      return response.status(status).json(errorResponse);
     }
 
     const convertErrorResponse = errorResponse as ErrorResponseType;
@@ -30,7 +30,8 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
     if (typeof convertErrorResponse.message === 'string') {
       message = convertErrorResponse.message;
     } else {
-      message = convertErrorResponse.message[0];
+      message =
+        convertErrorResponse.message[convertErrorResponse.message.length - 1];
     }
     response.status(status).json({
       statusCode: status,

@@ -6,10 +6,11 @@ import { User, UserSchema } from 'src/schemas/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { Favorite, FavoriteSchema } from 'src/schemas/favorite.schema';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, CloudinaryService],
   imports: [
     ConfigModule.forRoot({}),
     MongooseModule.forFeature([

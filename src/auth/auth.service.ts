@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -13,6 +14,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { Favorite } from 'src/schemas/favorite.schema';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdateProfileDto } from './dto/UpdateProfile.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +24,7 @@ export class AuthService {
     @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async register(data: RegisterDto) {
@@ -157,6 +161,45 @@ export class AuthService {
     }
   }
 
+  async updateProfile(
+    userId: string,
+    data: UpdateProfileDto,
+    avatar?: Express.Multer.File,
+  ) {
+    try {
+      const user = await this.userModel.findById(userId);
+      console.log(user.toJSON());
+      if (avatar) {
+        if (user.avatar_url.includes('res.cloudinary.com')) {
+          const arrSplit = user.avatar_url.split('/');
+          const file = arrSplit[arrSplit.length - 1];
+          const [fileName, type] = file.split('.');
+          this.cloudinaryService.deleteImage(fileName);
+        }
+        const result = await this.cloudinaryService.uploadImage(avatar);
+        user.avatar_url = result.url;
+      }
+      if (data.first_name && data.last_name) {
+        user.first_name = data.first_name;
+        user.last_name = data.last_name;
+      }
+
+      if (data.old_password && data.new_password) {
+        const isValidPw = bcrypt.compareSync(data.old_password, user.password);
+        if (!isValidPw) throw new UnauthorizedException('Password invalid');
+        user.password = bcrypt.hashSync(data.new_password, 10);
+      }
+      await user.save();
+
+      return {
+        ...user.toObject(),
+        password: undefined,
+        refresh_token: undefined,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
   private async generateToken(payload: { _id: string; email: string }) {
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload),
